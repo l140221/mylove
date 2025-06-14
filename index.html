@@ -15,6 +15,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative; /* 为按钮定位提供参考 */
         }
         .container {
             background-color: white;
@@ -23,6 +24,7 @@
             padding: 40px 30px;
             width: 90%;
             max-width: 550px;
+            position: relative; /* 确保按钮在容器内移动 */
         }
         h1 {
             color: #ff4d4d;
@@ -48,6 +50,8 @@
             justify-content: center;
             gap: 20px;
             margin-top: 20px;
+            position: relative; /* 按钮定位容器 */
+            min-height: 60px; /* 固定按钮区域高度，防止移动后布局混乱 */
         }
         .btn {
             padding: 18px 40px;
@@ -59,6 +63,9 @@
             transition: all 0.3s ease;
             flex: 1;
             max-width: 220px;
+            position: absolute; /* 改为绝对定位，实现自由移动 */
+            top: 0;
+            left: 0;
         }
         .btn-yes {
             background-color: #ff4d4d;
@@ -87,15 +94,15 @@
             font-weight: bold;
             display: none;
             line-height: 1.5;
+            z-index: 10; /* 确保文字在按钮上方 */
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>有句重要的话想告诉你~</h1>
-       <!-- <img src="C:\Users\悲伤的大树\Desktop\微信图片_20250614214425.jpg"  alt="可爱小熊" class="bear-img"> -->
-        <p class="intro-text">其实我喜欢你很久啦，可不可以给我一个机会呀~</p >
-        <div class="buttons">
+        <p class="intro-text">其实我喜欢你很久啦，可不可以给我一个机会呀~</p>
+        <div class="buttons" id="buttonsContainer">
             <button class="btn btn-yes" id="yesBtn">成为我的女朋友</button>
             <button class="btn btn-no" id="noBtn">不喜欢我，省省心吧</button>
         </div>
@@ -106,7 +113,9 @@
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const result = document.getElementById('result');
+        const buttonsContainer = document.getElementById('buttonsContainer');
         let scaleFactor = 1;
+        const moveRange = { x: 200, y: 100 }; // 水平/垂直最大移动范围（像素）
 
         yesBtn.addEventListener('click', function() {
             result.innerHTML = "太好啦！我会一直陪着你的~<br>以后的奶茶我都帮你选甜度呀~";
@@ -119,32 +128,53 @@
         noBtn.addEventListener('click', function() {
             if (yesBtn.disabled) return;
             
+            // 执行缩放逻辑（移除最小缩放限制）
             scaleFactor += 0.15;
             const yesScale = 1 + scaleFactor * 0.25;
             const noScale = 1 - scaleFactor * 0.15;
             
-            const minNoScale = 0.1;
-            if (noScale < minNoScale) {
-                noScale = minNoScale;
-                result.innerHTML = "别躲啦~<br>我已经准备好所有的喜欢啦！";
-                result.style.display = "block";
-                return;
-            }
-            
             yesBtn.style.transform = `scale(${yesScale})`;
             noBtn.style.transform = `scale(${noScale})`;
             
+            // 执行随机移动逻辑
+            moveButtonRandomly();
+            
+            // 更新提示文案
             if (scaleFactor <= 2) {
-                result.innerHTML = "再点我就变小啦~<br>真的不再考虑一下吗？";
+                result.innerHTML = "别跑呀~<br>再点我就躲得更远啦！";
             } else if (scaleFactor <= 4) {
-                result.innerHTML = "别调皮啦~<br>我准备了好多你喜欢的小惊喜呢！";
+                result.innerHTML = "调皮~<br>我准备了好多你喜欢的小惊喜呢！";
             } else if (scaleFactor <= 6) {
                 result.innerHTML = "快答应我吧~<br>以后你的快递我都帮你拿呀！";
             } else {
-                result.innerHTML = "我知道你在考验我~<br>我真的喜欢你！";
+                result.innerHTML = "我知道你在考验我~<br>我真的很认真喜欢你呀！";
             }
             result.style.display = "block";
         });
+
+        // 随机移动按钮的函数（无边界限制，但避免遮挡容器）
+        function moveButtonRandomly() {
+            // 获取容器尺寸
+            const containerRect = buttonsContainer.getBoundingClientRect();
+            const buttonRect = noBtn.getBoundingClientRect();
+            
+            // 计算容器内可移动的安全区域（留出边缘空间，避免按钮超出容器）
+            const safePadding = 20; // 边缘安全距离
+            const maxLeft = containerRect.width - buttonRect.width - safePadding;
+            const maxTop = containerRect.height - buttonRect.height - safePadding;
+            
+            // 生成随机偏移量（正负值实现四个方向移动）
+            const randomLeft = Math.floor(Math.random() * (moveRange.x * 2)) - moveRange.x;
+            const randomTop = Math.floor(Math.random() * (moveRange.y * 2)) - moveRange.y;
+            
+            // 确保按钮在容器内且不遮挡边缘
+            const newLeft = Math.max(safePadding, Math.min(maxLeft, randomLeft));
+            const newTop = Math.max(safePadding, Math.min(maxTop, randomTop));
+            
+            // 应用定位样式（绝对定位实现自由移动）
+            noBtn.style.top = `${newTop}px`;
+            noBtn.style.left = `${newLeft}px`;
+        }
 
         document.head.insertAdjacentHTML('beforeend', `
             <style>
