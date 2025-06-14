@@ -94,10 +94,10 @@
     <div class="container">
         <h1>有句重要的话想告诉你~</h1>
        <!-- <img src="C:\Users\悲伤的大树\Desktop\微信图片_20250614214425.jpg"  alt="可爱小熊" class="bear-img"> -->
-        <p class="intro-text">其实我喜欢你很久啦，要不要给我一个机会呀~</p >
+        <p class="intro-text">其实我喜欢你很久啦，可不可以给我一个机会呀~</p >
         <div class="buttons">
-            <button class="btn btn-yes" id="yesBtn">1. 成为我的女朋友</button>
-            <button class="btn btn-no" id="noBtn">2. 不要和你在一起</button>
+            <button class="btn btn-yes" id="yesBtn">成为我的女朋友</button>
+            <button class="btn btn-no" id="noBtn">不喜欢我，省省心吧</button>
         </div>
         <div id="result"></div>
     </div>
@@ -109,7 +109,7 @@
         let scaleFactor = 1;
 
         yesBtn.addEventListener('click', function() {
-            result.innerHTML = "太开心啦！我会用所有的温柔对你~<br>以后的奶茶我都帮你选甜度呀~";
+            result.innerHTML = "太好啦！我会一直陪着你的~<br>以后的奶茶我都帮你选甜度呀~";
             result.style.display = "block";
             yesBtn.disabled = true;
             noBtn.disabled = true;
@@ -123,10 +123,10 @@
             const yesScale = 1 + scaleFactor * 0.25;
             const noScale = 1 - scaleFactor * 0.15;
             
-            const minNoScale = 0.6;
+            const minNoScale = 0.1;
             if (noScale < minNoScale) {
                 noScale = minNoScale;
-                result.innerHTML = "别躲啦~<br>我已经准备好所有的喜欢给你啦！";
+                result.innerHTML = "别躲啦~<br>我已经准备好所有的喜欢啦！";
                 result.style.display = "block";
                 return;
             }
@@ -141,7 +141,7 @@
             } else if (scaleFactor <= 6) {
                 result.innerHTML = "快答应我吧~<br>以后你的快递我都帮你拿呀！";
             } else {
-                result.innerHTML = "我知道你在考验我~<br>但我真的很认真喜欢你呀！";
+                result.innerHTML = "我知道你在考验我~<br>我真的喜欢你！";
             }
             result.style.display = "block";
         });
