@@ -43,6 +43,7 @@
             justify-content: center;
             gap: 20px;
             margin-top: 20px;
+            position: relative;
         }
         .btn {
             padding: 18px 40px;
@@ -60,13 +61,11 @@
             background-color: #ff4d4d;
             color: white;
             box-shadow: 0 6px 12px rgba(255, 77, 77, 0.3);
-            z-index: 5;
         }
         .btn-no {
             background-color: #f0f0f0;
             color: #666;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 99; /* 最高层级 */
         }
         .btn:hover {
             transform: scale(1.05);
@@ -94,7 +93,7 @@
         <p class="intro-text">其实我喜欢你很久啦，可不可以给我一个机会呀~</p>
         <div class="buttons" id="buttonsContainer">
             <button class="btn btn-yes" id="yesBtn">成为我的女朋友</button>
-            <button class="btn btn-no" id="noBtn">不喜欢你，省省心吧</button>
+            <button class="btn btn-no" id="noBtn">不喜欢我，省省心吧</button>
         </div>
         <div id="result"></div>
     </div>
@@ -103,66 +102,58 @@
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const result = document.getElementById('result');
-        const mainContainer = document.getElementById('mainContainer');
         let scaleFactor = 1;
 
         yesBtn.addEventListener('click', function() {
             result.innerHTML = "太好啦！我会一直陪着你的~<br>以后的奶茶我都帮你选甜度呀~";
             result.style.display = "block";
             yesBtn.disabled = true;
-            noBtn.disabled = true;
             yesBtn.style.animation = "pulse 1.5s infinite";
+            
+            // 选项二消失逻辑（隐藏按钮）
+            noBtn.style.display = "none";
+            
+            // 可选：调整布局，让选项一居中
+            const buttonsContainer = document.getElementById('buttonsContainer');
+            buttonsContainer.style.justifyContent = "center";
         });
 
         noBtn.addEventListener('click', function() {
             if (yesBtn.disabled) return;
             
-            // 执行缩放逻辑
             scaleFactor += 0.15;
             const yesScale = 1 + scaleFactor * 0.25;
             const noScale = 1 - scaleFactor * 0.15;
             
+            const minNoScale = 0.6;
+            if (noScale < minNoScale) {
+                noScale = minNoScale;
+                result.innerHTML = "别躲啦~<br>我已经准备好所有的喜欢啦！";
+                result.style.display = "block";
+                return;
+            }
+            
             yesBtn.style.transform = `scale(${yesScale})`;
             noBtn.style.transform = `scale(${noScale})`;
             
-            // 执行主容器内随机移动逻辑
-            moveButtonInWhiteBox();
-            
-            // 更新提示文案
             if (scaleFactor <= 2) {
-                result.innerHTML = "别跑呀~<br>我追得上你哦！";
+                result.innerHTML = "再点我就变小啦~<br>真的不再考虑一下吗？";
             } else if (scaleFactor <= 4) {
-                result.innerHTML = "调皮~<br>快停下听我说！";
+                result.innerHTML = "别调皮啦~<br>我准备了好多你喜欢的小惊喜呢！";
             } else if (scaleFactor <= 6) {
-                result.innerHTML = "追到你啦~<br>要不要给我个机会？";
-            } else {
-                result.innerHTML = "我知道你在考验我~<br>我真的很认真喜欢你呀！";
+                result.innerHTML = "快答应我吧~<br>以后你的快递我都帮你拿呀！";
+            } else if(scaleFactor <= 8){
+                result.innerHTML = "我知道你在考验我~<br>我真的喜欢你！";
+            }else if(scaleFactor <= 10){
+                result.innerHTML = "这还是考验吗？<br> 可以啦!";
+            } else if(scaleFactor <= 12){
+                result.innerHTML = "要哭了<br> 好伤心!";
+            }else {
+                result.innerHTML = "好伤心啊好伤心";
             }
+                
             result.style.display = "block";
         });
-
-        // 按钮在白色框（主容器）内随机移动函数
-        function moveButtonInWhiteBox() {
-            // 获取主容器（白色框）尺寸
-            const containerRect = mainContainer.getBoundingClientRect();
-            const buttonRect = noBtn.getBoundingClientRect();
-            
-            // 计算容器内可移动范围（允许按钮边缘超出容器20px）
-            const maxLeft = containerRect.width - buttonRect.width + 20;
-            const maxTop = containerRect.height - buttonRect.height + 20;
-            const minLeft = -20;
-            const minTop = -20;
-            
-            // 生成随机坐标
-            const randomLeft = minLeft + Math.floor(Math.random() * (maxLeft - minLeft));
-            const randomTop = minTop + Math.floor(Math.random() * (maxTop - minTop));
-            
-            // 应用绝对定位和最高层级
-            noBtn.style.position = "absolute";
-            noBtn.style.top = `${randomTop}px`;
-            noBtn.style.left = `${randomLeft}px`;
-            noBtn.style.zIndex = "99"; // 最高层级，确保覆盖所有元素
-        }
 
         document.head.insertAdjacentHTML('beforeend', `
             <style>
