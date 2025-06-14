@@ -43,7 +43,6 @@
             justify-content: center;
             gap: 20px;
             margin-top: 20px;
-            position: relative;
         }
         .btn {
             padding: 18px 40px;
@@ -61,11 +60,13 @@
             background-color: #ff4d4d;
             color: white;
             box-shadow: 0 6px 12px rgba(255, 77, 77, 0.3);
+            z-index: 5;
         }
         .btn-no {
             background-color: #f0f0f0;
             color: #666;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 99; /* 最高层级 */
         }
         .btn:hover {
             transform: scale(1.05);
@@ -102,42 +103,32 @@
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const result = document.getElementById('result');
-        const buttonsContainer = document.getElementById('buttonsContainer');
+        const mainContainer = document.getElementById('mainContainer');
         let scaleFactor = 1;
-        const maxMoveDistance = 80; // 最大移动距离
 
         yesBtn.addEventListener('click', function() {
             result.innerHTML = "太好啦！我会一直陪着你的~<br>以后的奶茶我都帮你选甜度呀~";
             result.style.display = "block";
             yesBtn.disabled = true;
+            noBtn.disabled = true;
             yesBtn.style.animation = "pulse 1.5s infinite";
-            
-            // 选项二消失逻辑
-            noBtn.style.display = "none";
-            buttonsContainer.style.justifyContent = "center"; // 选项一居中
         });
 
         noBtn.addEventListener('click', function() {
             if (yesBtn.disabled) return;
             
+            // 执行缩放逻辑
             scaleFactor += 0.15;
             const yesScale = 1 + scaleFactor * 0.25;
             const noScale = 1 - scaleFactor * 0.15;
             
-            const minNoScale = 0.6;
-            if (noScale < minNoScale) {
-                noScale = minNoScale;
-                result.innerHTML = "别躲啦~<br>我已经准备好所有的喜欢啦！";
-                result.style.display = "block";
-                return;
-            }
-            
             yesBtn.style.transform = `scale(${yesScale})`;
             noBtn.style.transform = `scale(${noScale})`;
             
-            // 随机移动逻辑
-            moveButtonRandomly();
+            // 执行主容器内随机移动逻辑
+            moveButtonInWhiteBox();
             
+            // 更新提示文案
             if (scaleFactor <= 2) {
                 result.innerHTML = "再点我就变小啦~<br>真的不再考虑一下吗？";
             } else if (scaleFactor <= 3) {
@@ -154,23 +145,27 @@
                 result.innerHTML = "好伤心啊好伤心";
             }
 
-        // 随机移动函数
-        function moveButtonRandomly() {
-            const containerRect = buttonsContainer.getBoundingClientRect();
+        // 按钮在白色框（主容器）内随机移动函数
+        function moveButtonInWhiteBox() {
+            // 获取主容器（白色框）尺寸
+            const containerRect = mainContainer.getBoundingClientRect();
             const buttonRect = noBtn.getBoundingClientRect();
             
-            const maxLeft = containerRect.width - buttonRect.width;
-            const maxTop = containerRect.height - buttonRect.height;
+            // 计算容器内可移动范围（允许按钮边缘超出容器20px）
+            const maxLeft = containerRect.width - buttonRect.width + 20;
+            const maxTop = containerRect.height - buttonRect.height + 20;
+            const minLeft = -20;
+            const minTop = -20;
             
-            const randomLeft = Math.floor(Math.random() * (maxMoveDistance * 2)) - maxMoveDistance;
-            const randomTop = Math.floor(Math.random() * (maxMoveDistance * 2)) - maxMoveDistance;
+            // 生成随机坐标
+            const randomLeft = minLeft + Math.floor(Math.random() * (maxLeft - minLeft));
+            const randomTop = minTop + Math.floor(Math.random() * (maxTop - minTop));
             
-            const newLeft = Math.max(0, Math.min(maxLeft, randomLeft));
-            const newTop = Math.max(0, Math.min(maxTop, randomTop));
-            
-            noBtn.style.position = "relative";
-            noBtn.style.left = `${newLeft}px`;
-            noBtn.style.top = `${newTop}px`;
+            // 应用绝对定位和最高层级
+            noBtn.style.position = "absolute";
+            noBtn.style.top = `${randomTop}px`;
+            noBtn.style.left = `${randomLeft}px`;
+            noBtn.style.zIndex = "99"; // 最高层级，确保覆盖所有元素
         }
 
         document.head.insertAdjacentHTML('beforeend', `
