@@ -16,7 +16,6 @@
             justify-content: center;
             padding: 20px;
             position: relative;
-            overflow: hidden;
         }
         .container {
             background-color: white;
@@ -26,30 +25,24 @@
             width: 90%;
             max-width: 550px;
             position: relative;
-            z-index: 5;
+            overflow: visible;
         }
         h1 {
             color: #ff4d4d;
             margin-bottom: 25px;
             font-size: 32px;
             font-weight: 700;
-            position: relative;
-            z-index: 10;
         }
         .intro-text {
             color: #555;
             font-size: 18px;
             margin-bottom: 30px;
-            position: relative;
-            z-index: 10;
         }
         .buttons {
             display: flex;
             justify-content: center;
             gap: 20px;
             margin-top: 20px;
-            position: relative;
-            z-index: 10;
         }
         .btn {
             padding: 18px 40px;
@@ -92,8 +85,6 @@
             font-weight: bold;
             display: none;
             line-height: 1.5;
-            position: relative;
-            z-index: 20;
         }
     </style>
 </head>
@@ -134,8 +125,8 @@
             yesBtn.style.transform = `scale(${yesScale})`;
             noBtn.style.transform = `scale(${noScale})`;
             
-            // 执行全界面随机移动逻辑
-            moveButtonEverywhere();
+            // 执行主容器内随机移动逻辑
+            moveButtonInWhiteBox();
             
             // 更新提示文案
             if (scaleFactor <= 2) {
@@ -150,26 +141,27 @@
             result.style.display = "block";
         });
 
-        // 按钮全界面随机移动函数
-        function moveButtonEverywhere() {
-            // 获取视口尺寸（全界面范围）
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
+        // 按钮在白色框（主容器）内随机移动函数
+        function moveButtonInWhiteBox() {
+            // 获取主容器（白色框）尺寸
+            const containerRect = mainContainer.getBoundingClientRect();
             const buttonRect = noBtn.getBoundingClientRect();
             
-            // 计算按钮可移动的最大范围
-            const maxLeft = viewportWidth - buttonRect.width;
-            const maxTop = viewportHeight - buttonRect.height;
+            // 计算容器内可移动范围（允许按钮边缘超出容器20px）
+            const maxLeft = containerRect.width - buttonRect.width + 20;
+            const maxTop = containerRect.height - buttonRect.height + 20;
+            const minLeft = -20;
+            const minTop = -20;
             
-            // 生成随机坐标（覆盖全界面）
-            const randomLeft = Math.floor(Math.random() * maxLeft);
-            const randomTop = Math.floor(Math.random() * maxTop);
+            // 生成随机坐标
+            const randomLeft = minLeft + Math.floor(Math.random() * (maxLeft - minLeft));
+            const randomTop = minTop + Math.floor(Math.random() * (maxTop - minTop));
             
             // 应用绝对定位和最高层级
             noBtn.style.position = "absolute";
             noBtn.style.top = `${randomTop}px`;
             noBtn.style.left = `${randomLeft}px`;
-            noBtn.style.zIndex = "99"; // 确保高于所有元素
+            noBtn.style.zIndex = "99"; // 最高层级，确保覆盖所有元素
         }
 
         document.head.insertAdjacentHTML('beforeend', `
