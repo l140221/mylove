@@ -102,7 +102,9 @@
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
         const result = document.getElementById('result');
+        const buttonsContainer = document.getElementById('buttonsContainer');
         let scaleFactor = 1;
+        const maxMoveDistance = 80; // 最大移动距离
 
         yesBtn.addEventListener('click', function() {
             result.innerHTML = "太好啦！我会一直陪着你的~<br>以后的奶茶我都帮你选甜度呀~";
@@ -110,12 +112,9 @@
             yesBtn.disabled = true;
             yesBtn.style.animation = "pulse 1.5s infinite";
             
-            // 选项二消失逻辑（隐藏按钮）
+            // 选项二消失逻辑
             noBtn.style.display = "none";
-            
-            // 可选：调整布局，让选项一居中
-            const buttonsContainer = document.getElementById('buttonsContainer');
-            buttonsContainer.style.justifyContent = "center";
+            buttonsContainer.style.justifyContent = "center"; // 选项一居中
         });
 
         noBtn.addEventListener('click', function() {
@@ -136,6 +135,9 @@
             yesBtn.style.transform = `scale(${yesScale})`;
             noBtn.style.transform = `scale(${noScale})`;
             
+            // 随机移动逻辑
+            moveButtonRandomly();
+            
             if (scaleFactor <= 2) {
                 result.innerHTML = "再点我就变小啦~<br>真的不再考虑一下吗？";
             } else if (scaleFactor <= 3) {
@@ -151,9 +153,25 @@
             }else {
                 result.innerHTML = "好伤心啊好伤心";
             }
-                
-            result.style.display = "block";
-        });
+
+        // 随机移动函数
+        function moveButtonRandomly() {
+            const containerRect = buttonsContainer.getBoundingClientRect();
+            const buttonRect = noBtn.getBoundingClientRect();
+            
+            const maxLeft = containerRect.width - buttonRect.width;
+            const maxTop = containerRect.height - buttonRect.height;
+            
+            const randomLeft = Math.floor(Math.random() * (maxMoveDistance * 2)) - maxMoveDistance;
+            const randomTop = Math.floor(Math.random() * (maxMoveDistance * 2)) - maxMoveDistance;
+            
+            const newLeft = Math.max(0, Math.min(maxLeft, randomLeft));
+            const newTop = Math.max(0, Math.min(maxTop, randomTop));
+            
+            noBtn.style.position = "relative";
+            noBtn.style.left = `${newLeft}px`;
+            noBtn.style.top = `${newTop}px`;
+        }
 
         document.head.insertAdjacentHTML('beforeend', `
             <style>
